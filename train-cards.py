@@ -77,3 +77,28 @@ for images, labels in dataloader:
     break
 
 print(images.shape, labels.shape)
+
+#pytorch model
+class SimpleCardClassifier(nn.Module):
+    #define difference parts of the model
+    def __init__(self, num_classes= 53):
+        super(SimpleCardClassifier, self).__init__()
+
+        self.base_model= timm.create_model('efficientnet_b0', pretrained=True)
+        self.features = nn.Sequential(*list(self.base_model.children())[:-1])
+
+        enet_out_size=1280
+        #making a classifier
+        self.classifier= nn.Linear(enet_out_size, num_classes)
+    #take in an example or batch to connect them and return output
+    def forward(self,x):
+        x = self.features(x)
+        output = self.classifier(x)
+        return output
+#prints model
+model = SimpleCardClassifier(num_classes=53)
+print(str(model)[:500])
+#tests to see if model accepts input data we provide
+#prints out tensor info
+print(model(images))
+
